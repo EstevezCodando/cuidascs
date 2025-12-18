@@ -101,7 +101,7 @@ export const CameraVideoModal: React.FC<CameraVideoModalProps> = ({ camera, onCl
           {/* Video Player */}
           <div className="relative aspect-video bg-black">
             <video
-              src={camera.videoUrl}
+              src="/videos/LixoLocalErrado.mp4"
               className="w-full h-full object-cover"
               controls
               autoPlay

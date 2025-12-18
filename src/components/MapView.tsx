@@ -170,14 +170,14 @@ export const MapView: React.FC<MapViewProps> = ({
 
     const handleMapClick = (e: Event) => {
       const customEvent = e as CustomEvent<{ lat: number; lng: number }>;
-      if (isAddingOccurrence && onMapClick) {
+      if (onMapClick) {
         onMapClick(customEvent.detail.lat, customEvent.detail.lng);
       }
     };
 
     container.addEventListener('mapClick', handleMapClick);
     return () => container.removeEventListener('mapClick', handleMapClick);
-  }, [isAddingOccurrence, onMapClick]);
+  }, [onMapClick]);
 
   // Update hotspots layer
   useEffect(() => {
