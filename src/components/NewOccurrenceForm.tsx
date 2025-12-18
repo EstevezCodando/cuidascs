@@ -66,109 +66,118 @@ export const NewOccurrenceForm: React.FC<NewOccurrenceFormProps> = ({
 
   return (
     <motion.div
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 bg-background/80 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-background/80 backdrop-blur-sm"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
+      onClick={onClose}
     >
       <motion.div
-        className="w-full max-w-md bg-card rounded-t-2xl sm:rounded-2xl shadow-xl overflow-hidden"
+        className="w-full max-w-md bg-card rounded-t-2xl sm:rounded-2xl shadow-xl flex flex-col max-h-[90vh] sm:max-h-[85vh] sm:m-4"
         initial={{ y: 100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: 100, opacity: 0 }}
         transition={{ type: 'spring', damping: 25 }}
+        onClick={(e) => e.stopPropagation()}
       >
-        <div className="p-4 border-b flex items-center justify-between">
+        {/* Header fixo */}
+        <div className="p-4 border-b flex items-center justify-between shrink-0">
           <h3 className="font-semibold text-lg">Nova Ocorrência</h3>
           <Button variant="ghost" size="icon" onClick={onClose}>
             <X className="w-4 h-4" />
           </Button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-4 space-y-5">
-          {/* Location */}
-          <div className="flex items-center gap-2 p-3 bg-primary/10 rounded-lg text-sm">
-            <MapPin className="w-4 h-4 text-primary" />
-            <span className="text-muted-foreground">
-              {coordinates 
-                ? `${coordinates.lat.toFixed(5)}, ${coordinates.lng.toFixed(5)}`
-                : 'Selecione no mapa'
-              }
-            </span>
-          </div>
+        {/* Conteúdo rolável */}
+        <div className="flex-1 overflow-y-auto overscroll-contain">
+          <form id="occurrence-form" onSubmit={handleSubmit} className="p-4 space-y-5">
+            {/* Location */}
+            <div className="flex items-center gap-2 p-3 bg-primary/10 rounded-lg text-sm">
+              <MapPin className="w-4 h-4 text-primary" />
+              <span className="text-muted-foreground">
+                {coordinates 
+                  ? `${coordinates.lat.toFixed(5)}, ${coordinates.lng.toFixed(5)}`
+                  : 'Selecione no mapa'
+                }
+              </span>
+            </div>
 
-          {/* Waste Type */}
-          <div className="space-y-2">
-            <Label className="flex items-center gap-2">
-              <Package className="w-4 h-4" />
-              Tipo de Resíduo
-            </Label>
-            <RadioGroup
-              value={tipoResiduo}
-              onValueChange={(v) => setTipoResiduo(v as TipoResiduo)}
-              className="grid grid-cols-2 gap-2"
-            >
-              {(Object.keys(TIPO_RESIDUO_LABELS) as TipoResiduo[]).map((tipo) => (
-                <Label
-                  key={tipo}
-                  className={`flex items-center gap-2 p-3 rounded-lg border cursor-pointer transition-colors ${
-                    tipoResiduo === tipo 
-                      ? 'border-primary bg-primary/5' 
-                      : 'border-border hover:border-primary/50'
-                  }`}
-                >
-                  <RadioGroupItem value={tipo} className="sr-only" />
-                  <span className="text-lg">{TIPO_RESIDUO_ICONS[tipo]}</span>
-                  <span className="text-sm">{TIPO_RESIDUO_LABELS[tipo]}</span>
-                </Label>
-              ))}
-            </RadioGroup>
-          </div>
+            {/* Waste Type */}
+            <div className="space-y-2">
+              <Label className="flex items-center gap-2">
+                <Package className="w-4 h-4" />
+                Tipo de Resíduo
+              </Label>
+              <RadioGroup
+                value={tipoResiduo}
+                onValueChange={(v) => setTipoResiduo(v as TipoResiduo)}
+                className="grid grid-cols-2 gap-2"
+              >
+                {(Object.keys(TIPO_RESIDUO_LABELS) as TipoResiduo[]).map((tipo) => (
+                  <Label
+                    key={tipo}
+                    className={`flex items-center gap-2 p-3 rounded-lg border cursor-pointer transition-colors ${
+                      tipoResiduo === tipo 
+                        ? 'border-primary bg-primary/5' 
+                        : 'border-border hover:border-primary/50'
+                    }`}
+                  >
+                    <RadioGroupItem value={tipo} className="sr-only" />
+                    <span className="text-lg">{TIPO_RESIDUO_ICONS[tipo]}</span>
+                    <span className="text-sm">{TIPO_RESIDUO_LABELS[tipo]}</span>
+                  </Label>
+                ))}
+              </RadioGroup>
+            </div>
 
-          {/* Volume */}
-          <div className="space-y-2">
-            <Label>Volume Estimado</Label>
-            <RadioGroup
-              value={volumeFaixa}
-              onValueChange={(v) => setVolumeFaixa(v as FaixaVolume)}
-              className="flex gap-2"
-            >
-              {(Object.keys(FAIXA_VOLUME_LABELS) as FaixaVolume[]).map((vol) => (
-                <Label
-                  key={vol}
-                  className={`flex-1 text-center p-2 rounded-lg border cursor-pointer transition-colors text-xs ${
-                    volumeFaixa === vol 
-                      ? 'border-primary bg-primary/5' 
-                      : 'border-border hover:border-primary/50'
-                  }`}
-                >
-                  <RadioGroupItem value={vol} className="sr-only" />
-                  {FAIXA_VOLUME_LABELS[vol]}
-                </Label>
-              ))}
-            </RadioGroup>
-          </div>
+            {/* Volume */}
+            <div className="space-y-2">
+              <Label>Volume Estimado</Label>
+              <RadioGroup
+                value={volumeFaixa}
+                onValueChange={(v) => setVolumeFaixa(v as FaixaVolume)}
+                className="flex gap-2"
+              >
+                {(Object.keys(FAIXA_VOLUME_LABELS) as FaixaVolume[]).map((vol) => (
+                  <Label
+                    key={vol}
+                    className={`flex-1 text-center p-2 rounded-lg border cursor-pointer transition-colors text-xs ${
+                      volumeFaixa === vol 
+                        ? 'border-primary bg-primary/5' 
+                        : 'border-border hover:border-primary/50'
+                    }`}
+                  >
+                    <RadioGroupItem value={vol} className="sr-only" />
+                    {FAIXA_VOLUME_LABELS[vol]}
+                  </Label>
+                ))}
+              </RadioGroup>
+            </div>
 
-          {/* Description */}
-          <div className="space-y-2">
-            <Label className="flex items-center gap-2">
-              <FileText className="w-4 h-4" />
-              Descrição (opcional)
-            </Label>
-            <Textarea
-              placeholder="Descreva a situação..."
-              value={descricao}
-              onChange={(e) => setDescricao(e.target.value)}
-              rows={3}
-            />
-          </div>
+            {/* Description */}
+            <div className="space-y-2">
+              <Label className="flex items-center gap-2">
+                <FileText className="w-4 h-4" />
+                Descrição (opcional)
+              </Label>
+              <Textarea
+                placeholder="Descreva a situação..."
+                value={descricao}
+                onChange={(e) => setDescricao(e.target.value)}
+                rows={3}
+              />
+            </div>
 
-          {/* Photo placeholder */}
-          <div className="flex items-center gap-2 p-3 border border-dashed rounded-lg text-sm text-muted-foreground">
-            <Camera className="w-4 h-4" />
-            <span>Anexar foto (em breve)</span>
-          </div>
+            {/* Photo placeholder */}
+            <div className="flex items-center gap-2 p-3 border border-dashed rounded-lg text-sm text-muted-foreground">
+              <Camera className="w-4 h-4" />
+              <span>Anexar foto (em breve)</span>
+            </div>
+          </form>
+        </div>
 
+        {/* Footer fixo com declaração e botão */}
+        <div className="shrink-0 border-t bg-card p-4 space-y-3">
           {/* Veracity confirmation */}
           <div className="flex items-start gap-3 p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg">
             <Checkbox 
@@ -185,24 +194,36 @@ export const NewOccurrenceForm: React.FC<NewOccurrenceFormProps> = ({
                 <AlertTriangle className="w-3 h-3" />
                 Declaração de Veracidade
               </span>
-              Declaro que as informações fornecidas são verdadeiras e que o resíduo realmente existe no local indicado.
+              Declaro que as informações são verdadeiras.
             </Label>
           </div>
 
           {/* Submit */}
-          <Button 
-            type="submit" 
-            className="w-full" 
-            disabled={!coordinates || isSubmitting || !confirmaVeracidade}
-          >
-            {isSubmitting ? (
-              <Loader2 className="w-4 h-4 animate-spin mr-2" />
-            ) : (
-              <Send className="w-4 h-4 mr-2" />
+          <AnimatePresence>
+            {confirmaVeracidade && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                <Button 
+                  type="submit"
+                  form="occurrence-form"
+                  className="w-full" 
+                  disabled={!coordinates || isSubmitting}
+                >
+                  {isSubmitting ? (
+                    <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                  ) : (
+                    <Send className="w-4 h-4 mr-2" />
+                  )}
+                  Registrar Ocorrência
+                </Button>
+              </motion.div>
             )}
-            Registrar Ocorrência
-          </Button>
-        </form>
+          </AnimatePresence>
+        </div>
       </motion.div>
     </motion.div>
   );
