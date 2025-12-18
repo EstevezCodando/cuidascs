@@ -8,14 +8,17 @@ import {
   CheckCircle, 
   XCircle,
   Loader2,
-  Calendar
+  Calendar,
+  Trash2,
+  FileText
 } from 'lucide-react';
 import { useApp } from '@/contexts/AppContext';
 import { StatusBadge } from '@/components/StatusBadge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
+import { RouteMapPreview } from '@/components/RouteMapPreview';
 
 const RoteirosPage: React.FC = () => {
   const { roteiros, hotspots, atualizarStatusRoteiro, usuario } = useApp();
@@ -42,6 +45,21 @@ const RoteirosPage: React.FC = () => {
     (a, b) => b.criadoEm.getTime() - a.criadoEm.getTime()
   );
 
+  // Featured route data (Roteiro do Papel)
+  const roteiroPapel = {
+    nome: 'Roteiro do Papel',
+    horario: '08:00 - 10:30',
+    pontos: [
+      { lat: -15.7965, lng: -47.8875, label: 'Ponto 1' },
+      { lat: -15.7970, lng: -47.8868, label: 'Ponto 2' },
+      { lat: -15.7975, lng: -47.8862, label: 'Ponto 3' },
+      { lat: -15.7968, lng: -47.8855, label: 'Ponto 4' },
+    ],
+    container: { lat: -15.7980, lng: -47.8850, label: 'Caçamba' },
+    materiais: ['Papelão', 'Papel branco', 'Jornais', 'Revistas'],
+    cooperativa: 'CENTCOOP',
+  };
+
   return (
     <div className="container py-6 space-y-6">
       {/* Header */}
@@ -66,6 +84,96 @@ const RoteirosPage: React.FC = () => {
         >
           Criar Novo Roteiro
         </Button>
+      </motion.div>
+
+      {/* Featured Route - Roteiro do Papel */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+      >
+        <Card className="overflow-hidden border-2 border-primary/20">
+          <CardHeader className="bg-primary/5">
+            <div className="flex items-start justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                  <FileText className="w-6 h-6 text-primary" />
+                </div>
+                <div>
+                  <CardTitle className="text-lg">{roteiroPapel.nome}</CardTitle>
+                  <CardDescription className="flex items-center gap-2 mt-1">
+                    <Clock className="w-4 h-4" />
+                    Horário: {roteiroPapel.horario}
+                  </CardDescription>
+                </div>
+              </div>
+              <Badge className="bg-primary text-primary-foreground">
+                Em Destaque
+              </Badge>
+            </div>
+          </CardHeader>
+          <CardContent className="p-0">
+            <div className="grid lg:grid-cols-2">
+              {/* Map */}
+              <div className="h-64 lg:h-80">
+                <RouteMapPreview 
+                  points={roteiroPapel.pontos}
+                  containerPoint={roteiroPapel.container}
+                  className="h-full"
+                />
+              </div>
+              
+              {/* Route Details */}
+              <div className="p-4 space-y-4">
+                <div>
+                  <h4 className="text-sm font-medium text-muted-foreground mb-2">
+                    Pontos de Coleta
+                  </h4>
+                  <div className="space-y-2">
+                    {roteiroPapel.pontos.map((ponto, idx) => (
+                      <div key={idx} className="flex items-center gap-2 text-sm">
+                        <div className="w-6 h-6 rounded-full bg-amber-500 text-white flex items-center justify-center text-xs font-bold">
+                          {idx + 1}
+                        </div>
+                        <span>Ponto de coleta {idx + 1}</span>
+                        <span className="text-muted-foreground text-xs">
+                          ({ponto.lat.toFixed(4)}, {ponto.lng.toFixed(4)})
+                        </span>
+                      </div>
+                    ))}
+                    <div className="flex items-center gap-2 text-sm border-t pt-2 mt-2">
+                      <div className="w-6 h-6 rounded bg-green-600 text-white flex items-center justify-center">
+                        <Trash2 className="w-3 h-3" />
+                      </div>
+                      <span className="font-medium">Caçamba de destino</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="text-sm font-medium text-muted-foreground mb-2">
+                    Materiais Coletados
+                  </h4>
+                  <div className="flex flex-wrap gap-2">
+                    {roteiroPapel.materiais.map((material, idx) => (
+                      <Badge key={idx} variant="secondary" className="text-xs">
+                        {material}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between p-3 bg-success/10 rounded-lg">
+                  <div>
+                    <p className="text-sm font-medium">Cooperativa Responsável</p>
+                    <p className="text-xs text-muted-foreground">{roteiroPapel.cooperativa}</p>
+                  </div>
+                  <Badge className="bg-success text-success-foreground">Ativo</Badge>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </motion.div>
 
       {/* Routes List */}

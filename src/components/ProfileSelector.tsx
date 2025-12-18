@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { useApp } from '@/contexts/AppContext';
 import { PerfilUsuario } from '@/types';
 import { User, Briefcase, Building2, TrendingUp, ChevronDown, Check } from 'lucide-react';
@@ -19,6 +20,7 @@ const PERFIL_CONFIG: Record<PerfilUsuario, { label: string; icon: React.ElementT
 
 export const ProfileSelector: React.FC = () => {
   const { usuario, setPerfilAtivo } = useApp();
+  const navigate = useNavigate();
   const currentConfig = PERFIL_CONFIG[usuario.perfil];
   const Icon = currentConfig.icon;
 
@@ -47,7 +49,12 @@ export const ProfileSelector: React.FC = () => {
           return (
             <DropdownMenuItem
               key={perfil}
-              onClick={() => setPerfilAtivo(perfil)}
+              onClick={() => {
+                setPerfilAtivo(perfil);
+                if (perfil === 'patrocinador') {
+                  navigate('/dashboard');
+                }
+              }}
               className="flex items-center gap-2 cursor-pointer"
             >
               <PerfilIcon className={`w-4 h-4 ${config.color}`} />

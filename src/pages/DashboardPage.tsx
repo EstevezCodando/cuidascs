@@ -10,11 +10,16 @@ import {
   Bell,
   Recycle,
   Calendar,
-  Filter
+  Filter,
+  FileText,
+  Users,
+  DollarSign,
+  Building2
 } from 'lucide-react';
 import { useApp } from '@/contexts/AppContext';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Select,
   SelectContent,
@@ -39,8 +44,10 @@ import {
 import { TIPO_RESIDUO_LABELS, TIPO_RESIDUO_COLORS, TipoResiduo } from '@/types';
 
 const DashboardPage: React.FC = () => {
-  const { calcularMetricas, ocorrencias, hotspots } = useApp();
+  const { calcularMetricas, ocorrencias, hotspots, usuario } = useApp();
   const [periodo, setPeriodo] = useState('7d');
+  const [activeTab, setActiveTab] = useState('metricas');
+  const isPatrocinador = usuario.perfil === 'patrocinador';
 
   const metricas = useMemo(() => calcularMetricas(), [calcularMetricas]);
 
@@ -187,6 +194,229 @@ const DashboardPage: React.FC = () => {
         </Select>
       </motion.div>
 
+      {/* Tabs for Patrocinador */}
+      {isPatrocinador ? (
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <TabsList className="grid w-full max-w-md grid-cols-2">
+            <TabsTrigger value="metricas" className="flex items-center gap-2">
+              <BarChart3 className="w-4 h-4" />
+              Métricas
+            </TabsTrigger>
+            <TabsTrigger value="prestacao" className="flex items-center gap-2">
+              <FileText className="w-4 h-4" />
+              Prestação de Contas
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="metricas" className="space-y-6">
+            <DashboardContent 
+              metricas={metricas} 
+              wasteTypeData={wasteTypeData}
+              scoreDistribution={scoreDistribution}
+              dailyData={dailyData}
+              containerVariants={containerVariants}
+              itemVariants={itemVariants}
+              MetricCard={MetricCard}
+            />
+          </TabsContent>
+
+          <TabsContent value="prestacao" className="space-y-6">
+            <PrestacaoContas />
+          </TabsContent>
+        </Tabs>
+      ) : (
+        <DashboardContent 
+          metricas={metricas} 
+          wasteTypeData={wasteTypeData}
+          scoreDistribution={scoreDistribution}
+          dailyData={dailyData}
+          containerVariants={containerVariants}
+          itemVariants={itemVariants}
+          MetricCard={MetricCard}
+        />
+      )}
+    </div>
+  );
+};
+
+// Prestação de Contas Component
+const PrestacaoContas: React.FC = () => {
+  const custos = [
+    { categoria: 'Tecnologia e Infraestrutura', valor: 45000, descricao: 'Servidores, APIs, manutenção' },
+    { categoria: 'Equipe Técnica', valor: 85000, descricao: 'Desenvolvedores, analistas, suporte' },
+    { categoria: 'Operações de Campo', valor: 35000, descricao: 'Equipamentos, transporte, logística' },
+    { categoria: 'Parcerias com Cooperativas', valor: 25000, descricao: 'Capacitação e suporte operacional' },
+    { categoria: 'Marketing e Comunicação', valor: 15000, descricao: 'Divulgação e conscientização' },
+  ];
+
+  const equipe = [
+    { nome: 'Gabriel Malaquias', cargo: 'Desenvolvedor', area: 'Tecnologia' },
+    { nome: 'Marco Sabino', cargo: 'Desenvolvedor', area: 'Tecnologia' },
+    { nome: 'Jheniffer Meneses', cargo: 'Desenvolvedora', area: 'Tecnologia' },
+    { nome: 'João Moreno', cargo: 'Desenvolvedor', area: 'Tecnologia' },
+    { nome: 'Shaka Niken', cargo: 'Coordenador do Projeto', area: 'Gestão' },
+    { nome: 'Mateus Araújo', cargo: 'Desenvolvedor', area: 'Tecnologia' },
+    { nome: 'João Monteiro', cargo: 'Desenvolvedor', area: 'Tecnologia' },
+    { nome: 'Jean Alvarez', cargo: 'Analista de Dados', area: 'Tecnologia' },
+  ];
+
+  const totalCustos = custos.reduce((acc, item) => acc + item.valor, 0);
+
+  return (
+    <motion.div 
+      className="space-y-6"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+    >
+      {/* Summary Cards */}
+      <div className="grid gap-4 sm:grid-cols-3">
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Investimento Total</p>
+                <p className="text-2xl font-bold mt-1">
+                  R$ {totalCustos.toLocaleString('pt-BR')}
+                </p>
+                <p className="text-xs text-success mt-1">Período: 2024</p>
+              </div>
+              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                <DollarSign className="w-5 h-5 text-primary" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Equipe Envolvida</p>
+                <p className="text-2xl font-bold mt-1">{equipe.length} pessoas</p>
+                <p className="text-xs text-muted-foreground mt-1">Dedicação integral</p>
+              </div>
+              <div className="w-10 h-10 rounded-lg bg-info/10 flex items-center justify-center">
+                <Users className="w-5 h-5 text-info" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Cooperativas Parceiras</p>
+                <p className="text-2xl font-bold mt-1">2 ativas</p>
+                <p className="text-xs text-muted-foreground mt-1">CENTCOOP e ACAPAS</p>
+              </div>
+              <div className="w-10 h-10 rounded-lg bg-success/10 flex items-center justify-center">
+                <Building2 className="w-5 h-5 text-success" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Custos Detalhados */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base flex items-center gap-2">
+            <DollarSign className="w-5 h-5 text-primary" />
+            Detalhamento de Custos
+          </CardTitle>
+          <CardDescription>Distribuição dos recursos por categoria</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {custos.map((item, index) => (
+              <div key={index} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                <div className="flex-1">
+                  <p className="font-medium text-sm">{item.categoria}</p>
+                  <p className="text-xs text-muted-foreground">{item.descricao}</p>
+                </div>
+                <div className="text-right">
+                  <p className="font-semibold">R$ {item.valor.toLocaleString('pt-BR')}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {((item.valor / totalCustos) * 100).toFixed(1)}%
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Equipe */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base flex items-center gap-2">
+            <Users className="w-5 h-5 text-info" />
+            Equipe do Projeto
+          </CardTitle>
+          <CardDescription>Profissionais dedicados ao Cuida SCS</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {equipe.map((pessoa, index) => (
+              <div key={index} className="p-3 bg-muted/50 rounded-lg">
+                <p className="font-medium text-sm">{pessoa.nome}</p>
+                <p className="text-xs text-muted-foreground">{pessoa.cargo}</p>
+                <Badge variant="outline" className="mt-2 text-xs">{pessoa.area}</Badge>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Foto da Cooperativa */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base flex items-center gap-2">
+            <Building2 className="w-5 h-5 text-success" />
+            Cooperativas em Ação
+          </CardTitle>
+          <CardDescription>Registro do trabalho realizado pelas cooperativas parceiras</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="relative rounded-lg overflow-hidden">
+            <img 
+              src="/images/centcoop-cooperativa.jpg" 
+              alt="Trabalhadores da cooperativa CENTCOOP realizando triagem de materiais recicláveis"
+              className="w-full h-auto object-cover rounded-lg"
+            />
+            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
+              <p className="text-white text-sm font-medium">
+                Triagem de materiais recicláveis
+              </p>
+              <p className="text-white/80 text-xs mt-1">
+                Fonte: CENTCOOP - Cooperativa de Catadores do DF
+              </p>
+            </div>
+          </div>
+          <p className="text-sm text-muted-foreground mt-4">
+            A Central das Cooperativas de Materiais Recicláveis do DF (CENTCOOP) é uma das principais 
+            parceiras do projeto Cuida SCS, responsável pela coleta e processamento de materiais 
+            recicláveis identificados pela plataforma.
+          </p>
+        </CardContent>
+      </Card>
+    </motion.div>
+  );
+};
+
+// Dashboard Content Component
+const DashboardContent: React.FC<{
+  metricas: any;
+  wasteTypeData: any[];
+  scoreDistribution: any[];
+  dailyData: any[];
+  containerVariants: any;
+  itemVariants: any;
+  MetricCard: React.FC<any>;
+}> = ({ metricas, wasteTypeData, scoreDistribution, dailyData, containerVariants, itemVariants, MetricCard }) => {
+  return (
+    <>
       {/* KPI Cards */}
       <motion.div
         className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4"
@@ -383,7 +613,7 @@ const DashboardPage: React.FC = () => {
           </Card>
         </motion.div>
       </motion.div>
-    </div>
+    </>
   );
 };
 
